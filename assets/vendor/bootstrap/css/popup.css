@@ -12,7 +12,7 @@
   }
 
   .modal-content {
-    background-color: #ffffff;
+    background-color: #0d1f33c4;
     margin: 15% auto;
     padding: 20px;
     /*border: 1px solid #888;*/
@@ -50,7 +50,7 @@
   }
 
   .popup-option {
-    background-color: #ffffff;
+    background-color: #11254082;
     display: flex;
     flex-direction: column;
     align-items: center;
