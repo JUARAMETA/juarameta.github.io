@@ -1,0 +1,104 @@
+/* Popup styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-content {
+    background-color: #ffffff;
+    margin: 15% auto;
+    padding: 20px;
+    /*border: 1px solid #888;*/
+    width: 80%;
+    animation: fadeIn 0.3s ease-in-out;
+    border-radius: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row-reverse;
+    justify-content: center;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease-in-out;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+  }
+
+  .popup-option {
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+    padding: 15px;
+    /*border: 2px solid #3498db;*/
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+    /* Sesuaikan ukuran maksimum */
+    position: relative;
+  }
+
+  .popup-option:hover {
+    border-color: #2980b9;
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .popup-option img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-top: 10px;
+    transition: transform 0.3s ease-in-out;
+
+  }
+
+  .popup-option:hover img {
+    transform: scale(1.1);
+  }
+
+  .popup-option p {
+    opacity: 0;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(52, 152, 219, 0.8);
+    color: #fff;
+    padding: 10px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .popup-option:hover p {
+    /* Ubah opacity saat hover */
+    opacity: 1;
+  }

@@ -5,7 +5,8 @@
 * Author: BootstrapMade.com
 * License: https://bootstrapmade.com/license/
 */
-(function() {
+(
+  function() {
   "use strict";
 
   /**
@@ -230,5 +231,4 @@
    * Initiate Pure Counter 
    */
   new PureCounter();
-
 })()
