@@ -16,7 +16,7 @@ body {
 }
 
 a {
-  color: #2dc997;
+  color: #00c4ff;
   text-decoration: none;
 }
 
@@ -30,7 +30,6 @@ a:focus {
 
 p {
   padding: 0;
-  margin: 0 0 30px 0;
 }
 
 h1,
@@ -1144,7 +1143,7 @@ section {
 # Footer
 --------------------------------------------------------------*/
 #footer {
-  background: #343b40;
+  background: #0a2131;
   padding: 5px 0;
   color: #fff;
   font-size: 14px;
