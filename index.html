@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JuaraMeta - Daftar Hadir</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <script defer src="script.js"></script>
+</head>
+<body class="bg-light">
+
+    <div class="container py-4">
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <h2 class="text-center mb-3">📋 JuaraMeta - Daftar Hadir</h2>
+                
+                <div class="text-center mb-3">
+                    <button class="btn btn-primary" onclick="requestLocation()">📍 Izinkan Lokasi</button>
+                    <p id="lokasi-status" class="mt-2 text-danger fw-bold">⚠️ Lokasi belum diizinkan</p>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <input type="text" id="nama" class="form-control" placeholder="📝 Nama">
+                    </div>
+                    <div class="col-md-4">
+                        <select id="status" class="form-select">
+                            <option value="">📌 Pilih Status</option>
+                            <option value="Hadir">✅ Hadir</option>
+                            <option value="Tidak Hadir">❌ Tidak Hadir</option>
+                            <option value="Sakit">🤒 Sakit</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 text-md-end">
+                        <button class="btn btn-success w-100" id="btn-submit" onclick="submitForm()">📨 Kirim</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-lg mt-4">
+            <div class="card-body">
+                <h3 class="text-center">📊 Data Kehadiran</h3>
+                <div class="table-responsive">
+                    <table id="dataTable" class="table table-bordered table-striped mt-3">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Waktu</th>
+                                <th>Nama</th>
+                                <th>Status</th>
+                                <th>Lokasi</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data akan dimuat di sini -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Modal Kustom untuk Pesan -->
+    <div id="customAlert" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Pemberitahuan</h5>
+                    <button type="button" class="btn-close" onclick="closeAlert()" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="alertMessage"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
