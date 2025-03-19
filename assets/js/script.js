@@ -56,7 +56,7 @@ function loadData() {
                     hour12: false
                 });
 
-                let localTime = `${formattedDate} : ${formattedTime} AM`;
+                let localTime = `${formattedDate} : ${formattedTime}`;
 
                 if (rowDate === today) {
                     let googleMapsLink = `https://www.google.com/maps?q=${row[3]},${row[4]}`;
