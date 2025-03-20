@@ -33,7 +33,7 @@
         }
         .btn-custom:hover {
             transform: scale(1.05);
-            background-color: #000fe2 !important;
+            background-color: #ff4757 !important;
         }
         .table th, .table td {
             vertical-align: middle;
@@ -41,6 +41,11 @@
         }
         .modal-content {
             border-radius: 15px;
+        }
+        .modal-dialog {
+            display: flex;
+            align-items: center;
+            min-height: 80vh;
         }
         img {
             max-width: 250px;
@@ -126,7 +131,7 @@
         </div>
     </div>
     <div id="customAlert" class="modal fade" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" data-aos="zoom-in">
                 <div class="modal-header">
                     <h5 class="modal-title">Pemberitahuan</h5>
