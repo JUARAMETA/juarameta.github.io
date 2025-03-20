@@ -22,7 +22,6 @@ function requestLocation() {
 }
 
 
-
 function loadData() {
     fetch(scriptURL)
         .then(response => response.json())
@@ -103,9 +102,8 @@ function submitForm() {
     const status = document.getElementById("status").value;
     const regexNama = /^[A-Za-z0-9\s-]+$/;
 
-
     if (!nama.match(regexNama)) {
-        showAlert("❌ Nama hanya boleh mengandung huruf dan spasi!");
+        showAlert("❌ Nama hanya boleh mengandung huruf, angka, dan spasi!");
         return;
     }
     if (!nama || !status) {
@@ -117,23 +115,45 @@ function submitForm() {
         return;
     }
 
-    fetch(scriptURL, {
-        method: "POST",
-        body: new URLSearchParams({ nama, status, latitude, longitude }),
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    })
-    .then(response => response.text())
-    .then(() => {
-        showAlert("✅ Data berhasil dikirim ke JuaraMeta!");
-        document.getElementById("nama").value = "";
-        document.getElementById("status").value = "";
-        loadData();
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        showAlert("❌ Gagal mengirim data. Silakan coba lagi!");
-    });
+    // Cek apakah sudah absen hari ini
+    fetch(scriptURL)
+        .then(response => response.json())
+        .then(data => {
+            let today = new Date().toISOString().split("T")[0];
+            let alreadyCheckedIn = data.slice(1).some(row => {
+                let timestamp = new Date(row[0]).toISOString().split("T")[0];
+                return row[1] === nama && timestamp === today;
+            });
+
+            if (alreadyCheckedIn) {
+                showAlert("⚠️ Anda sudah absen hari ini!");
+                return;
+            }
+
+            // Jika belum absen, kirim data
+            fetch(scriptURL, {
+                method: "POST",
+                body: new URLSearchParams({ nama, status, latitude, longitude }),
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            })
+            .then(response => response.text())
+            .then(() => {
+                showAlert("✅ Data berhasil dikirim ke JuaraMeta!");
+                document.getElementById("nama").value = "";
+                document.getElementById("status").value = "";
+                loadData();
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                showAlert("❌ Gagal mengirim data. Silakan coba lagi!");
+            });
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            showAlert("❌ Gagal mengambil data. Silakan coba lagi!");
+        });
 }
+
 
 
 window.onload = function() {
