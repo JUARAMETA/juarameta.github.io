@@ -82,11 +82,9 @@ function openMap(lat, lon) {
     window.open(`https://www.google.com/maps?q=${lat},${lon}`, "_blank");
 }
 
-// Fungsi untuk menampilkan modal notifikasi
 function showAlert(message) {
     document.getElementById("alertMessage").innerText = message;
     
-    // Gunakan Bootstrap modal API agar modal muncul dengan benar
     let alertModal = new bootstrap.Modal(document.getElementById("customAlert"));
     alertModal.show();
 }
@@ -115,7 +113,6 @@ function submitForm() {
         return;
     }
 
-    // Cek apakah sudah absen hari ini
     fetch(scriptURL)
         .then(response => response.json())
         .then(data => {
@@ -130,7 +127,6 @@ function submitForm() {
                 return;
             }
 
-            // Jika belum absen, kirim data
             fetch(scriptURL, {
                 method: "POST",
                 body: new URLSearchParams({ nama, status, latitude, longitude }),
