@@ -98,7 +98,7 @@ function closeAlert() {
 function submitForm() {
     const nama = document.getElementById("nama").value.trim();
     const status = document.getElementById("status").value;
-    const regexNama = /^[A-Za-z0-9\s-]+$/;
+    const regexNama = /^[A-Za-z0-9\s.-]+$/;
 
     if (!nama.match(regexNama)) {
         showAlert("❌ Nama hanya boleh mengandung huruf, angka, dan spasi!");
