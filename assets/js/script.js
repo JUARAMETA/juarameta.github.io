@@ -1,4 +1,4 @@
-const scriptURL = "https://script.google.com/macros/s/AKfycbyib14Bqwor_C8obsmnTshVB2lOE6ttM6MlL5SteMXNiX-l5Zt30FTpzNqZWt8LZK2B9Q/exec"; 
+const scriptURL = "https://script.google.com/macros/s/AKfycbxJuo6MPyYzgoxGUoO5t5JV6hVAwmES2SbJZA0lLs90GfvYnAsAmRA-NfziCkvCgBFSoQ/exec"; 
 let latitude = null, longitude = null;
 
 function requestLocation() {
@@ -155,3 +155,4 @@ function submitForm() {
 window.onload = function() {
     loadData();
 };
+
