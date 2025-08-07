@@ -1,4 +1,4 @@
-const scriptURL = "https://script.google.com/macros/s/AKfycbxsDJNwrDQo64DdXSHMhPbVxh0VsHfxhfEXlZBil0u56g2qGB_GuQ-_psXAHb9AQYEeEQ/exec"; 
+const scriptURL = "https://script.google.com/macros/s/AKfycbxjK-oemDGWzhy3vhWn2OEc_tJdj4l_4pcqiFczr_KkjnZ538ESqkBoRqUTnk3RE2fFYA/exec";
 let latitude = null, longitude = null;
 
 function requestLocation() {
@@ -21,7 +21,6 @@ function requestLocation() {
     }
 }
 
-
 function loadData() {
     fetch(scriptURL)
         .then(response => response.json())
@@ -37,12 +36,10 @@ function loadData() {
 
             let today = new Date().toISOString().split("T")[0];
 
-            // Membalik urutan data agar yang terbaru di atas
             data.slice(1).reverse().forEach(row => {
                 let timestamp = new Date(row[0]);
                 let rowDate = timestamp.toISOString().split("T")[0];
 
-                // Format waktu menjadi "1 Februari 2025 17:00"
                 let formattedDate = timestamp.toLocaleDateString("id-ID", {
                     day: "numeric",
                     month: "long",
@@ -76,25 +73,6 @@ function loadData() {
         .catch(error => console.error("Error:", error));
 }
 
-
-
-function openMap(lat, lon) {
-    window.open(`https://www.google.com/maps?q=${lat},${lon}`, "_blank");
-}
-
-function showAlert(message) {
-    document.getElementById("alertMessage").innerText = message;
-    
-    let alertModal = new bootstrap.Modal(document.getElementById("customAlert"));
-    alertModal.show();
-}
-
-function closeAlert() {
-    let alertModalEl = document.getElementById("customAlert");
-    let alertModal = bootstrap.Modal.getInstance(alertModalEl);
-    alertModal.hide();
-}
-
 function submitForm() {
     const nama = document.getElementById("nama").value.trim();
     const status = document.getElementById("status").value;
@@ -104,16 +82,17 @@ function submitForm() {
         showAlert("❌ Nama hanya boleh mengandung huruf, angka, dan spasi!");
         return;
     }
+
     if (!nama || !status) {
         showAlert("⚠️ Harap isi semua data!");
         return;
     }
+
     if (latitude === null || longitude === null) {
         showAlert("⚠️ Harap izinkan lokasi terlebih dahulu!");
         return;
     }
 
-    // Kirim data langsung tanpa cek duplikat
     fetch(scriptURL, {
         method: "POST",
         body: new URLSearchParams({ nama, status, latitude, longitude }),
@@ -124,7 +103,7 @@ function submitForm() {
         showAlert("✅ Data berhasil dikirim ke JuaraMeta!");
         document.getElementById("nama").value = "";
         document.getElementById("status").value = "";
-        loadData(); // Bisa kosong atau gunakan Google Visualization API jika ingin load data
+        loadData();
     })
     .catch(error => {
         console.error("Error:", error);
@@ -132,12 +111,22 @@ function submitForm() {
     });
 }
 
+function openMap(lat, lon) {
+    window.open(`https://www.google.com/maps?q=${lat},${lon}`, "_blank");
+}
 
+function showAlert(message) {
+    document.getElementById("alertMessage").innerText = message;
+    let alertModal = new bootstrap.Modal(document.getElementById("customAlert"));
+    alertModal.show();
+}
 
+function closeAlert() {
+    let alertModalEl = document.getElementById("customAlert");
+    let alertModal = bootstrap.Modal.getInstance(alertModalEl);
+    alertModal.hide();
+}
 
 window.onload = function() {
     loadData();
 };
-
-
-
