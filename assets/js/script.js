@@ -96,7 +96,6 @@ function submitForm() {
     fetch(scriptURL, {
         method: "POST",
         body: new URLSearchParams({ nama, status, latitude, longitude }),
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
     })
     .then(response => response.text())
     .then(() => {
@@ -130,4 +129,5 @@ function closeAlert() {
 window.onload = function() {
     loadData();
 };
+
 
