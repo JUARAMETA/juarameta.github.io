@@ -113,47 +113,31 @@ function submitForm() {
         return;
     }
 
-    fetch(scriptURL)
-        .then(response => response.json())
-        .then(data => {
-            let today = new Date().toISOString().split("T")[0];
-            let alreadyCheckedIn = data.slice(1).some(row => {
-                let timestamp = new Date(row[0]).toISOString().split("T")[0];
-                return row[1] === nama && timestamp === today;
-            });
-
-            if (alreadyCheckedIn) {
-                showAlert("⚠️ Anda sudah absen hari ini!");
-                return;
-            }
-
-            fetch(scriptURL, {
-                method: "POST",
-                body: new URLSearchParams({ nama, status, latitude, longitude }),
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            })
-            .then(response => response.text())
-            .then(() => {
-                showAlert("✅ Data berhasil dikirim ke JuaraMeta!");
-                document.getElementById("nama").value = "";
-                document.getElementById("status").value = "";
-                loadData();
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                showAlert("❌ Gagal mengirim data. Silakan coba lagi!");
-            });
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            showAlert("❌ Gagal mengambil data. Silakan coba lagi!");
-        });
+    // Kirim data langsung tanpa cek duplikat
+    fetch(scriptURL, {
+        method: "POST",
+        body: new URLSearchParams({ nama, status, latitude, longitude }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    })
+    .then(response => response.text())
+    .then(() => {
+        showAlert("✅ Data berhasil dikirim ke JuaraMeta!");
+        document.getElementById("nama").value = "";
+        document.getElementById("status").value = "";
+        loadData(); // Bisa kosong atau gunakan Google Visualization API jika ingin load data
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        showAlert("❌ Gagal mengirim data. Silakan coba lagi!");
+    });
 }
+
 
 
 
 window.onload = function() {
     loadData();
 };
+
 
 
