@@ -65,14 +65,14 @@ function requestLocation() {
 
 // ==== Load data dari Firestore ====
 async function loadData() {
-    let tableContent = `<thead class="table-dark text-center">
+    let tableContent = ` <thead class="table-dark text-center">
         <tr>
             <th>Waktu</th>
             <th>Nama</th>
             <th>Status</th>
             <th>Lokasi</th>
         </tr>
-    </thead><tbody>`;
+    </thead><tbody> `;
 
     let today = new Date().toISOString().split("T")[0];
     const q = query(collection(db, "absensi"), orderBy("timestamp", "desc"));
@@ -157,6 +157,7 @@ function showAlert(message) {
 document.getElementById("btnLokasi").addEventListener("click", requestLocation);
 document.getElementById("btnSubmit").addEventListener("click", submitForm);
 window.onload = loadData;
+
 
 
 
