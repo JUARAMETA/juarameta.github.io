@@ -35,7 +35,7 @@ function requestLocation() {
         (position) => {
             latitude = position.coords.latitude;
             longitude = position.coords.longitude;
-            document.getElementById("lokasi-status").innerText = "📍 Lokasi: " + latitude + ", " + longitude;
+            document.getElementById("lokasi-status").innerText = " Lokasi: " + latitude + ", " + longitude;
             document.getElementById("lokasi-status").classList.remove("error");
             document.getElementById("lokasi-status").classList.add("success");
         },
@@ -156,5 +156,6 @@ function showAlert(message) {
 document.getElementById("btnLokasi").addEventListener("click", requestLocation);
 document.getElementById("btnSubmit").addEventListener("click", submitForm);
 window.onload = loadData;
+
 
 
