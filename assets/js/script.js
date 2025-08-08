@@ -155,8 +155,9 @@ function showAlert(message) {
 
 // ==== Event Listener ====
 document.getElementById("btnLokasi").addEventListener("click", requestLocation);
-document.getElementById("btnSubmit").addEventListener("click", submitForm);
+document.getElementById("btn-submit").addEventListener("click", submitForm);
 window.onload = loadData;
+
 
 
 
