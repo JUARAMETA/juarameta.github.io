@@ -1,13 +1,12 @@
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+// ==== Import Firebase dari CDN ====
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
+import { 
+    getFirestore, collection, addDoc, getDocs, query, orderBy, Timestamp 
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
+// ==== Konfigurasi Firebase ====
+const firebaseConfig = {
     apiKey: "AIzaSyCw-m4u-Vnj-01ykZNaDTbe25xcSF0jlAE",
     authDomain: "daftarhadirmeta.firebaseapp.com",
     projectId: "daftarhadirmeta",
@@ -15,13 +14,14 @@
     messagingSenderId: "990984880996",
     appId: "1:990984880996:web:eb89cb22c310f500afb071",
     measurementId: "G-63JYX45FSM"
-  };
+};
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+// ==== Inisialisasi Firebase & Firestore ====
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getFirestore(app);
 
+// ==== Variabel lokasi ====
 let latitude = null, longitude = null;
 
 // ==== Fungsi minta lokasi ====
@@ -59,14 +59,9 @@ function requestLocation() {
             document.getElementById("lokasi-status").classList.remove("success");
             document.getElementById("lokasi-status").classList.add("error");
         },
-        {
-            enableHighAccuracy: true, // GPS lebih akurat
-            timeout: 10000,           // Maksimal 10 detik
-            maximumAge: 0
-        }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
 }
-
 
 // ==== Load data dari Firestore ====
 async function loadData() {
@@ -80,7 +75,6 @@ async function loadData() {
     </thead><tbody>`;
 
     let today = new Date().toISOString().split("T")[0];
-
     const q = query(collection(db, "absensi"), orderBy("timestamp", "desc"));
     const querySnapshot = await getDocs(q);
 
@@ -90,17 +84,11 @@ async function loadData() {
         let rowDate = timestamp.toISOString().split("T")[0];
 
         let formattedDate = timestamp.toLocaleDateString("id-ID", {
-            day: "numeric",
-            month: "long",
-            year: "numeric"
+            day: "numeric", month: "long", year: "numeric"
         });
-
         let formattedTime = timestamp.toLocaleTimeString("id-ID", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false
+            hour: "2-digit", minute: "2-digit", hour12: false
         });
-
         let localTime = `${formattedDate} : ${formattedTime}`;
 
         if (rowDate === today) {
@@ -130,12 +118,10 @@ async function submitForm() {
         showAlert("❌ Nama hanya boleh mengandung huruf, angka, dan spasi!");
         return;
     }
-
     if (!nama || !status) {
         showAlert("⚠️ Harap isi semua data!");
         return;
     }
-
     if (latitude === null || longitude === null) {
         showAlert("⚠️ Harap izinkan lokasi terlebih dahulu!");
         return;
@@ -149,7 +135,6 @@ async function submitForm() {
             latitude: latitude,
             longitude: longitude
         });
-
         showAlert("✅ Data berhasil dikirim ke Firestore!");
         document.getElementById("nama").value = "";
         document.getElementById("status").value = "";
@@ -160,24 +145,14 @@ async function submitForm() {
     }
 }
 
-// ==== Fungsi tambahan ====
-function openMap(lat, lon) {
-    window.open(`https://www.google.com/maps?q=${lat},${lon}`, "_blank");
-}
-
+// ==== Fungsi alert ====
 function showAlert(message) {
     document.getElementById("alertMessage").innerText = message;
     let alertModal = new bootstrap.Modal(document.getElementById("customAlert"));
     alertModal.show();
 }
 
-function closeAlert() {
-    let alertModalEl = document.getElementById("customAlert");
-    let alertModal = bootstrap.Modal.getInstance(alertModalEl);
-    alertModal.hide();
-}
-
-window.onload = function() {
-    loadData();
-};
-
+// ==== Event Listener ====
+document.getElementById("btnLokasi").addEventListener("click", requestLocation);
+document.getElementById("btnSubmit").addEventListener("click", submitForm);
+window.onload = loadData;
