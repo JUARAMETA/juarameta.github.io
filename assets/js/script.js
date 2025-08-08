@@ -5,7 +5,7 @@ import {
     getFirestore, collection, addDoc, getDocs, query, orderBy, Timestamp 
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-// ==== Konfigurasi Firebase ====
+// ==== Konfigurasi Firebase ===
 const firebaseConfig = {
     apiKey: "AIzaSyCw-m4u-Vnj-01ykZNaDTbe25xcSF0jlAE",
     authDomain: "daftarhadirmeta.firebaseapp.com",
@@ -156,3 +156,4 @@ function showAlert(message) {
 document.getElementById("btnLokasi").addEventListener("click", requestLocation);
 document.getElementById("btnSubmit").addEventListener("click", submitForm);
 window.onload = loadData;
+
