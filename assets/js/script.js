@@ -1,115 +1,101 @@
-// ==== Import Firebase dari CDN ====
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
-import { 
-    getFirestore, collection, addDoc, getDocs, query, orderBy, Timestamp 
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-// ==== Konfigurasi Firebase ====
-const firebaseConfig = {
-    apiKey: "AIzaSyCw-m4u-Vnj-01ykZNaDTbe25xcSF0jlAE",
-    authDomain: "daftarhadirmeta.firebaseapp.com",
-    projectId: "daftarhadirmeta",
-    storageBucket: "daftarhadirmeta.firebasestorage.app",
-    messagingSenderId: "990984880996",
-    appId: "1:990984880996:web:eb89cb22c310f500afb071",
-    measurementId: "G-63JYX45FSM"
-};
-
-// ==== Inisialisasi Firebase & Firestore ====
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getFirestore(app);
-
-// ==== Variabel lokasi ====
+const scriptURL = "https://script.google.com/macros/s/AKfycbxsDJNwrDQo64DdXSHMhPbVxh0VsHfxhfEXlZBil0u56g2qGB_GuQ-_psXAHb9AQYEeEQ/exec"; 
 let latitude = null, longitude = null;
 
-// ==== Fungsi minta lokasi ====
 function requestLocation() {
-    if (!("geolocation" in navigator)) {
-        showAlert("⚠️ Perangkat tidak mendukung GPS.");
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-            latitude = position.coords.latitude;
-            longitude = position.coords.longitude;
-            document.getElementById("lokasi-status").innerText = `📍 Lokasi: ${latitude}, ${longitude}`;
-            document.getElementById("lokasi-status").classList.remove("error");
-            document.getElementById("lokasi-status").classList.add("success");
-        },
-        (error) => {
-            let message = "";
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    message = "❌ Akses lokasi ditolak. Silakan izinkan di pengaturan browser.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    message = "⚠️ Lokasi tidak tersedia. Periksa koneksi GPS atau internet.";
-                    break;
-                case error.TIMEOUT:
-                    message = "⏳ Permintaan lokasi terlalu lama. Coba lagi.";
-                    break;
-                default:
-                    message = "⚠️ Terjadi kesalahan mendapatkan lokasi.";
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                latitude = position.coords.latitude;
+                longitude = position.coords.longitude;
+                document.getElementById("lokasi-status").innerText = `📍 Lokasi: ${latitude}, ${longitude}`;
+                document.getElementById("lokasi-status").classList.add("success");
+            },
+            (error) => {
+                showAlert("⚠️ Gagal mendapatkan lokasi: " + error.message);
+                document.getElementById("lokasi-status").innerText = "⚠️ Lokasi tidak tersedia";
+                document.getElementById("lokasi-status").classList.add("error");
             }
-            showAlert(message);
-            document.getElementById("lokasi-status").innerText = "⚠️ Lokasi tidak tersedia";
-            document.getElementById("lokasi-status").classList.remove("success");
-            document.getElementById("lokasi-status").classList.add("error");
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
+        );
+    } else {
+        showAlert("⚠️ Perangkat tidak mendukung GPS.");
+    }
 }
 
-// ==== Load data dari Firestore ====
-async function loadData() {
-    let tableContent = `<thead class="table-dark text-center">
-        <tr>
-            <th>Waktu</th>
-            <th>Nama</th>
-            <th>Status</th>
-            <th>Lokasi</th>
-        </tr>
-    </thead><tbody>`;
 
-    let today = new Date().toISOString().split("T")[0];
-    const q = query(collection(db, "absensi"), orderBy("timestamp", "desc"));
-    const querySnapshot = await getDocs(q);
+function loadData() {
+    fetch(scriptURL)
+        .then(response => response.json())
+        .then(data => {
+            let tableContent = `<thead class="table-dark text-center">
+                <tr>
+                    <th>Waktu</th>
+                    <th>Nama</th>
+                    <th>Status</th>
+                    <th>Lokasi</th>
+                </tr>
+            </thead><tbody>`;
 
-    querySnapshot.forEach((doc) => {
-        let row = doc.data();
-        let timestamp = row.timestamp.toDate();
-        let rowDate = timestamp.toISOString().split("T")[0];
+            let today = new Date().toISOString().split("T")[0];
 
-        let formattedDate = timestamp.toLocaleDateString("id-ID", {
-            day: "numeric", month: "long", year: "numeric"
-        });
-        let formattedTime = timestamp.toLocaleTimeString("id-ID", {
-            hour: "2-digit", minute: "2-digit", hour12: false
-        });
-        let localTime = `${formattedDate} : ${formattedTime}`;
+            // Membalik urutan data agar yang terbaru di atas
+            data.slice(1).reverse().forEach(row => {
+                let timestamp = new Date(row[0]);
+                let rowDate = timestamp.toISOString().split("T")[0];
 
-        if (rowDate === today) {
-            let googleMapsLink = `https://www.google.com/maps?q=${row.latitude},${row.longitude}`;
-            tableContent += `<tr>
-                <td style="text-align: center;">${localTime}</td>
-                <td style="text-align: center;">${row.nama}</td>
-                <td style="text-align: center;">${row.status}</td>
-                <td style="text-align: center;">
-                    <a href="${googleMapsLink}" target="_blank" class="text-primary fw-bold" style="text-decoration: none;">📍 Google Maps</a>
-                </td>
-            </tr>`;
-        }
-    });
+                // Format waktu menjadi "1 Februari 2025 17:00"
+                let formattedDate = timestamp.toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric"
+                });
 
-    tableContent += `</tbody>`;
-    document.getElementById("dataTable").innerHTML = tableContent;
+                let formattedTime = timestamp.toLocaleTimeString("id-ID", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false
+                });
+
+                let localTime = `${formattedDate} : ${formattedTime}`;
+
+                if (rowDate === today) {
+                    let googleMapsLink = `https://www.google.com/maps?q=${row[3]},${row[4]}`;
+                    tableContent += `<tr>
+                        <td style="text-align: center;">${localTime}</td>
+                        <td style="text-align: center;">${row[1]}</td>
+                        <td style="text-align: center;">${row[2]}</td>
+                        <td style="text-align: center;">
+                            <a href="${googleMapsLink}" target="_blank" class="text-primary fw-bold" style="text-decoration: none;">📍 Google Maps</a>
+                        </td>
+                    </tr>`;
+                }
+            });
+
+            tableContent += `</tbody>`;
+            document.getElementById("dataTable").innerHTML = tableContent;
+        })
+        .catch(error => console.error("Error:", error));
 }
 
-// ==== Kirim data ke Firestore ====
-async function submitForm() {
+
+
+function openMap(lat, lon) {
+    window.open(`https://www.google.com/maps?q=${lat},${lon}`, "_blank");
+}
+
+function showAlert(message) {
+    document.getElementById("alertMessage").innerText = message;
+    
+    let alertModal = new bootstrap.Modal(document.getElementById("customAlert"));
+    alertModal.show();
+}
+
+function closeAlert() {
+    let alertModalEl = document.getElementById("customAlert");
+    let alertModal = bootstrap.Modal.getInstance(alertModalEl);
+    alertModal.hide();
+}
+
+function submitForm() {
     const nama = document.getElementById("nama").value.trim();
     const status = document.getElementById("status").value;
     const regexNama = /^[A-Za-z0-9\s.-]+$/;
@@ -127,32 +113,30 @@ async function submitForm() {
         return;
     }
 
-    try {
-        await addDoc(collection(db, "absensi"), {
-            timestamp: Timestamp.now(),
-            nama: nama,
-            status: status,
-            latitude: latitude,
-            longitude: longitude
-        });
-        showAlert("✅ Data berhasil dikirim ke Firestore!");
+    // Kirim data langsung tanpa cek duplikat
+    fetch(scriptURL, {
+        method: "POST",
+        body: new URLSearchParams({ nama, status, latitude, longitude }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    })
+    .then(response => response.text())
+    .then(() => {
+        showAlert("✅ Data berhasil dikirim ke JuaraMeta!");
         document.getElementById("nama").value = "";
         document.getElementById("status").value = "";
-        loadData();
-    } catch (error) {
+        loadData(); // Bisa kosong atau gunakan Google Visualization API jika ingin load data
+    })
+    .catch(error => {
         console.error("Error:", error);
         showAlert("❌ Gagal mengirim data. Silakan coba lagi!");
-    }
+    });
 }
 
-// ==== Fungsi alert ====
-function showAlert(message) {
-    document.getElementById("alertMessage").innerText = message;
-    let alertModal = new bootstrap.Modal(document.getElementById("customAlert"));
-    alertModal.show();
-}
 
-// ==== Event Listener ====
-document.getElementById("btnLokasi").addEventListener("click", requestLocation);
-document.getElementById("btnSubmit").addEventListener("click", submitForm);
-window.onload = loadData;
+
+
+window.onload = function() {
+    loadData();
+};
+
+
