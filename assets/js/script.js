@@ -1,43 +1,72 @@
-// ==== Konfigurasi Firebase ====
-// Ganti isi firebaseConfig ini sesuai project Firebase kamu
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, Timestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-const firebaseConfig = {
-    apiKey: "API_KEY",
-    authDomain: "PROJECT_ID.firebaseapp.com",
-    projectId: "PROJECT_ID",
-    storageBucket: "PROJECT_ID.appspot.com",
-    messagingSenderId: "SENDER_ID",
-    appId: "APP_ID"
-};
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCw-m4u-Vnj-01ykZNaDTbe25xcSF0jlAE",
+    authDomain: "daftarhadirmeta.firebaseapp.com",
+    projectId: "daftarhadirmeta",
+    storageBucket: "daftarhadirmeta.firebasestorage.app",
+    messagingSenderId: "990984880996",
+    appId: "1:990984880996:web:eb89cb22c310f500afb071",
+    measurementId: "G-63JYX45FSM"
+  };
 
-// Inisialisasi Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 
 let latitude = null, longitude = null;
 
 // ==== Fungsi minta lokasi ====
 function requestLocation() {
-    if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                latitude = position.coords.latitude;
-                longitude = position.coords.longitude;
-                document.getElementById("lokasi-status").innerText = `📍 Lokasi: ${latitude}, ${longitude}`;
-                document.getElementById("lokasi-status").classList.add("success");
-            },
-            (error) => {
-                showAlert("⚠️ Gagal mendapatkan lokasi: " + error.message);
-                document.getElementById("lokasi-status").innerText = "⚠️ Lokasi tidak tersedia";
-                document.getElementById("lokasi-status").classList.add("error");
-            }
-        );
-    } else {
+    if (!("geolocation" in navigator)) {
         showAlert("⚠️ Perangkat tidak mendukung GPS.");
+        return;
     }
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            latitude = position.coords.latitude;
+            longitude = position.coords.longitude;
+            document.getElementById("lokasi-status").innerText = `📍 Lokasi: ${latitude}, ${longitude}`;
+            document.getElementById("lokasi-status").classList.remove("error");
+            document.getElementById("lokasi-status").classList.add("success");
+        },
+        (error) => {
+            let message = "";
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    message = "❌ Akses lokasi ditolak. Silakan izinkan di pengaturan browser.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    message = "⚠️ Lokasi tidak tersedia. Periksa koneksi GPS atau internet.";
+                    break;
+                case error.TIMEOUT:
+                    message = "⏳ Permintaan lokasi terlalu lama. Coba lagi.";
+                    break;
+                default:
+                    message = "⚠️ Terjadi kesalahan mendapatkan lokasi.";
+            }
+            showAlert(message);
+            document.getElementById("lokasi-status").innerText = "⚠️ Lokasi tidak tersedia";
+            document.getElementById("lokasi-status").classList.remove("success");
+            document.getElementById("lokasi-status").classList.add("error");
+        },
+        {
+            enableHighAccuracy: true, // GPS lebih akurat
+            timeout: 10000,           // Maksimal 10 detik
+            maximumAge: 0
+        }
+    );
 }
+
 
 // ==== Load data dari Firestore ====
 async function loadData() {
@@ -151,3 +180,4 @@ function closeAlert() {
 window.onload = function() {
     loadData();
 };
+
