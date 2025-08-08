@@ -65,14 +65,14 @@ function requestLocation() {
 
 // ==== Load data dari Firestore ====
 async function loadData() {
-    let tableContent = <thead class="table-dark text-center">
+    let tableContent = `<thead class="table-dark text-center">
         <tr>
             <th>Waktu</th>
             <th>Nama</th>
             <th>Status</th>
             <th>Lokasi</th>
         </tr>
-    </thead><tbody>;
+    </thead><tbody>`;
 
     let today = new Date().toISOString().split("T")[0];
     const q = query(collection(db, "absensi"), orderBy("timestamp", "desc"));
@@ -89,24 +89,25 @@ async function loadData() {
         let formattedTime = timestamp.toLocaleTimeString("id-ID", {
             hour: "2-digit", minute: "2-digit", hour12: false
         });
-        let localTime = ${formattedDate} : ${formattedTime};
+        let localTime = `${formattedDate} : ${formattedTime}`;
 
         if (rowDate === today) {
-            let googleMapsLink = https://www.google.com/maps?q=${row.latitude},${row.longitude};
-            tableContent += <tr>
+            let googleMapsLink = `https://www.google.com/maps?q=${row.latitude},${row.longitude}`;
+            tableContent += `<tr>
                 <td style="text-align: center;">${localTime}</td>
                 <td style="text-align: center;">${row.nama}</td>
                 <td style="text-align: center;">${row.status}</td>
                 <td style="text-align: center;">
                     <a href="${googleMapsLink}" target="_blank" class="text-primary fw-bold" style="text-decoration: none;">📍 Google Maps</a>
                 </td>
-            </tr>;
+            </tr>`;
         }
     });
 
-    tableContent += </tbody>;
+    tableContent += `</tbody>`;
     document.getElementById("dataTable").innerHTML = tableContent;
 }
+
 
 // ==== Kirim data ke Firestore ====
 async function submitForm() {
@@ -156,6 +157,7 @@ function showAlert(message) {
 document.getElementById("btnLokasi").addEventListener("click", requestLocation);
 document.getElementById("btnSubmit").addEventListener("click", submitForm);
 window.onload = loadData;
+
 
 
 
