@@ -1,6 +1,24 @@
-const scriptURL = "https://script.google.com/macros/s/AKfycbw1wafXReh6QVUUGLEKQkdl9i1pE2gB7LGY0Dw8_ZHK2Dzd50vop5HiGNCd2WmLBFa2dg/exec";
+// ==== Konfigurasi Firebase ====
+// Ganti isi firebaseConfig ini sesuai project Firebase kamu
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, Timestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "API_KEY",
+    authDomain: "PROJECT_ID.firebaseapp.com",
+    projectId: "PROJECT_ID",
+    storageBucket: "PROJECT_ID.appspot.com",
+    messagingSenderId: "SENDER_ID",
+    appId: "APP_ID"
+};
+
+// Inisialisasi Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 let latitude = null, longitude = null;
 
+// ==== Fungsi minta lokasi ====
 function requestLocation() {
     if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
@@ -21,59 +39,60 @@ function requestLocation() {
     }
 }
 
-function loadData() {
-    fetch(scriptURL)
-        .then(response => response.json())
-        .then(data => {
-            let tableContent = `<thead class="table-dark text-center">
-                <tr>
-                    <th>Waktu</th>
-                    <th>Nama</th>
-                    <th>Status</th>
-                    <th>Lokasi</th>
-                </tr>
-            </thead><tbody>`;
+// ==== Load data dari Firestore ====
+async function loadData() {
+    let tableContent = `<thead class="table-dark text-center">
+        <tr>
+            <th>Waktu</th>
+            <th>Nama</th>
+            <th>Status</th>
+            <th>Lokasi</th>
+        </tr>
+    </thead><tbody>`;
 
-            let today = new Date().toISOString().split("T")[0];
+    let today = new Date().toISOString().split("T")[0];
 
-            data.slice(1).reverse().forEach(row => {
-                let timestamp = new Date(row[0]);
-                let rowDate = timestamp.toISOString().split("T")[0];
+    const q = query(collection(db, "absensi"), orderBy("timestamp", "desc"));
+    const querySnapshot = await getDocs(q);
 
-                let formattedDate = timestamp.toLocaleDateString("id-ID", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric"
-                });
+    querySnapshot.forEach((doc) => {
+        let row = doc.data();
+        let timestamp = row.timestamp.toDate();
+        let rowDate = timestamp.toISOString().split("T")[0];
 
-                let formattedTime = timestamp.toLocaleTimeString("id-ID", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: false
-                });
+        let formattedDate = timestamp.toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        });
 
-                let localTime = `${formattedDate} : ${formattedTime}`;
+        let formattedTime = timestamp.toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        });
 
-                if (rowDate === today) {
-                    let googleMapsLink = `https://www.google.com/maps?q=${row[3]},${row[4]}`;
-                    tableContent += `<tr>
-                        <td style="text-align: center;">${localTime}</td>
-                        <td style="text-align: center;">${row[1]}</td>
-                        <td style="text-align: center;">${row[2]}</td>
-                        <td style="text-align: center;">
-                            <a href="${googleMapsLink}" target="_blank" class="text-primary fw-bold" style="text-decoration: none;">📍 Google Maps</a>
-                        </td>
-                    </tr>`;
-                }
-            });
+        let localTime = `${formattedDate} : ${formattedTime}`;
 
-            tableContent += `</tbody>`;
-            document.getElementById("dataTable").innerHTML = tableContent;
-        })
-        .catch(error => console.error("Error:", error));
+        if (rowDate === today) {
+            let googleMapsLink = `https://www.google.com/maps?q=${row.latitude},${row.longitude}`;
+            tableContent += `<tr>
+                <td style="text-align: center;">${localTime}</td>
+                <td style="text-align: center;">${row.nama}</td>
+                <td style="text-align: center;">${row.status}</td>
+                <td style="text-align: center;">
+                    <a href="${googleMapsLink}" target="_blank" class="text-primary fw-bold" style="text-decoration: none;">📍 Google Maps</a>
+                </td>
+            </tr>`;
+        }
+    });
+
+    tableContent += `</tbody>`;
+    document.getElementById("dataTable").innerHTML = tableContent;
 }
 
-function submitForm() {
+// ==== Kirim data ke Firestore ====
+async function submitForm() {
     const nama = document.getElementById("nama").value.trim();
     const status = document.getElementById("status").value;
     const regexNama = /^[A-Za-z0-9\s.-]+$/;
@@ -93,23 +112,26 @@ function submitForm() {
         return;
     }
 
-    fetch(scriptURL, {
-        method: "POST",
-        body: new URLSearchParams({ nama, status, latitude, longitude }),
-    })
-    .then(response => response.text())
-    .then(() => {
-        showAlert("✅ Data berhasil dikirim ke JuaraMeta!");
+    try {
+        await addDoc(collection(db, "absensi"), {
+            timestamp: Timestamp.now(),
+            nama: nama,
+            status: status,
+            latitude: latitude,
+            longitude: longitude
+        });
+
+        showAlert("✅ Data berhasil dikirim ke Firestore!");
         document.getElementById("nama").value = "";
         document.getElementById("status").value = "";
         loadData();
-    })
-    .catch(error => {
+    } catch (error) {
         console.error("Error:", error);
         showAlert("❌ Gagal mengirim data. Silakan coba lagi!");
-    });
+    }
 }
 
+// ==== Fungsi tambahan ====
 function openMap(lat, lon) {
     window.open(`https://www.google.com/maps?q=${lat},${lon}`, "_blank");
 }
